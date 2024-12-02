@@ -4,10 +4,17 @@ import React, { useRef, useEffect, useState } from "react";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import "@tensorflow/tfjs";
 
+// واجهة لتحديد نوع الكائنات المكتشفة
+interface DetectedObject {
+  class: string;
+  score: number;
+  bbox: [number, number, number, number]; // [x, y, width, height]
+}
+
 const CameraFeed = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [detectedObjects, setDetectedObjects] = useState<any[]>([]);
+  const [detectedObjects, setDetectedObjects] = useState<DetectedObject[]>([]);
 
   useEffect(() => {
     let model: cocoSsd.ObjectDetection;
@@ -43,7 +50,7 @@ const CameraFeed = () => {
             );
 
             // تحديث الحالة لعرض الكائنات المكتشفة
-            setDetectedObjects(filteredPredictions);
+            setDetectedObjects(filteredPredictions as DetectedObject[]);
 
             filteredPredictions.forEach((prediction) => {
               context.strokeStyle = "red";
@@ -106,7 +113,7 @@ const CameraFeed = () => {
           <ul className="list-disc list-inside">
             {detectedObjects.map((obj, index) => (
               <li key={index} className="text-lg">
-                {obj.class} - دقة: {(obj.score! * 100).toFixed(1)}%
+                {obj.class} - دقة: {(obj.score * 100).toFixed(1)}%
               </li>
             ))}
           </ul>
